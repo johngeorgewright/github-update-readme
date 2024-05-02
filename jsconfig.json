@@ -3,9 +3,9 @@
     "declaration": true,
     "esModuleInterop": true,
     "incremental": true,
-    "lib": ["dom", "es2020"],
-    "module": "commonjs",
-    "moduleResolution": "node",
+    "lib": ["es2020"],
+    "module": "ESNext",
+    "moduleResolution": "NodeNext",
     "noImplicitOverride": true,
     "noImplicitReturns": true,
     "noUnusedLocals": true,
@@ -13,8 +13,7 @@
     "outDir": "./dist",
     "resolveJsonModule": true,
     "sourceMap": true,
-    "strict": true,
-    "target": "es6"
+    "strict": true
   },
   "includes": ["src"]
 }
