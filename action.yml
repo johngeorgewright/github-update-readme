@@ -50,15 +50,15 @@ inputs:
     required: false
     default: |
       ## ${header}
-      
+
       ${subhead}
 
       ---
-      
+
       ${repoTable}
-      
+
       ---
-      
+
       ${footer}
 
 outputs:
@@ -70,5 +70,5 @@ branding:
   color: green
 
 runs:
-  using: 'node12'
-  main: 'index.js'
+  using: node20
+  main: index.js
