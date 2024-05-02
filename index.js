@@ -1,41 +1,41 @@
+// @ts-check
+
 const core = require("@actions/core");
 const { Octokit } = require('@octokit/core')
 const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
 
-(async () => {
+const GITHUB_REPOSITORY = process.env.GITHUB_REPOSITORY || ''
+
+;(async () => {
   try {
     const repoCount = parseInt(core.getInput('repoCount'))
     const repoPerRow = parseInt(core.getInput('reposPerRow'))
     const imageSize = parseInt(core.getInput('imageSize'))
     const ref = core.getInput('ref')
 
-    const username = process.env.GITHUB_REPOSITORY.split("/")[0]
-    const repo = process.env.GITHUB_REPOSITORY.split("/")[1]
-    const getReadme = await octokit.request('GET /repos/{owner}/{repo}/contents/{path}', {
+    const username = GITHUB_REPOSITORY.split("/")[0]
+    const repo = GITHUB_REPOSITORY.split("/")[1]
+
+    const { data: readmes } = await octokit.request('GET /repos/{owner}/{repo}/contents/{path}', {
       owner: username,
       repo: repo,
       path: core.getInput('path'),
-    }).catch(e => {
-      console.error("Failed: ", e)
-      core.setFailed("Failed: ", e.message)
     })
-    const sha = getReadme.data.sha
 
+    const readme = Array.isArray(readmes) ? readmes[0] : readmes
+
+    /** @type {boolean[]} */
     let recentReposHaveImage = []
     let recentRepos = new Set()
     
     /** GitHub Activity pagination is limited at 100 records x 3 pages */
     for (let i = 0; recentRepos.size < repoCount && i < 3; i++) {
       console.log(i)
-      const getActivity = await octokit.request(`GET /users/{username}/events/public?per_page=100&page=${i}`, {
+      const { data: activity } = await octokit.request(`GET /users/{username}/events/public?per_page=100&page=${i}`, {
         username: username,
-      }).catch(e => {
-        console.error("Failed: ", e)
-        core.setFailed("Failed: ", e.message)
       })
-      console.log(getActivity)
-      console.log(getActivity.data)
-      for (const value of getActivity.data) {
+      console.log(activity)
+      for (const value of activity) {
         console.log(value)
         let activityRepo = value.repo.name
         if (value.type === "ForkEvent") activityRepo = value.payload.forkee.full_name
@@ -52,8 +52,7 @@ const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
         repo: repo.split("/")[1],
         path: 'DISPLAY.jpg',
       }).then(() => {
-        recentReposHaveImage.push(true)
-      }).catch(e => {
+        recentReposHaveImage.push(true),
         recentReposHaveImage.push(false)
       })
     }
@@ -81,20 +80,22 @@ const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
       path: core.getInput('path'),
       message: '(Automated) Update README.md',
       content: Buffer.from(data, "utf8").toString('base64'),
-      sha: sha,
-    }).then(() => {
-      core.setOutput("repositories", Array.from(recentRepos))
-    }).catch((e) => {
-      console.error("Failed: ", e)
-      core.setFailed("Failed: ", e.message)
+      sha: readme.sha
     })
 
+    core.setOutput("repositories", Array.from(recentRepos))
   } catch (e) {
     console.error("Failed: ", e)
-    core.setFailed("Failed: ", e.message)
+    core.setFailed("Failed: " + /** @type {any} */(e).message)
   }
 })()
 
+/**
+ * @template T
+ * @param {T[]} array 
+ * @param {number} size 
+ * @returns {T[][]}
+ */
 const chunkArray = (array, size) => {
   let chunked = []
   let index = 0
