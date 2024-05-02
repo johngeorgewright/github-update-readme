@@ -63,9 +63,14 @@ const GITHUB_REPOSITORY = process.env.GITHUB_REPOSITORY || ''
           repo: repo.split('/')[1],
           path: 'DISPLAY.jpg',
         })
-        .then(() => {
-          recentReposHaveImage.push(true), recentReposHaveImage.push(false)
-        })
+        .then(
+          () => {
+            recentReposHaveImage.push(true)
+          },
+          () => {
+            recentReposHaveImage.push(false)
+          },
+        )
     }
 
     const data = core
