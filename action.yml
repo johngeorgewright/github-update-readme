@@ -1,6 +1,10 @@
 name: 'github-update-readme'
 description: 'Update your profile README.md to show your latest activity.'
 inputs:
+  commit-message:
+    description: The commit message
+    required: false
+    default: (Automated) Update README.md
   header:
     description: 'The header of your README.md. Markdown supported.'
     required: true

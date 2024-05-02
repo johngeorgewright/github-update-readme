@@ -78,7 +78,7 @@ const GITHUB_REPOSITORY = process.env.GITHUB_REPOSITORY || ''
       owner: username,
       repo: repo,
       path: core.getInput('path'),
-      message: '(Automated) Update README.md',
+      message: core.getInput('commit-message'),
       content: Buffer.from(data, "utf8").toString('base64'),
       sha: readme.sha
     })
