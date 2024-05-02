@@ -4,7 +4,7 @@
     "esModuleInterop": true,
     "incremental": true,
     "lib": ["es2020"],
-    "module": "ESNext",
+    "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "noImplicitOverride": true,
     "noImplicitReturns": true,
